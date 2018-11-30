@@ -1,0 +1,6 @@
+[package]
+name = "ray-tracing-one-weekend-rs"
+version = "0.1.0"
+authors = ["Michael Baxter <meb.michael@gmail.com>"]
+
+[dependencies]
