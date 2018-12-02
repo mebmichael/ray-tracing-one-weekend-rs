@@ -5,10 +5,26 @@ pub use image_wrapper::ImageDataRGB;
 pub use vector_math::vec3::Vec3;
 pub use vector_math::ray::Ray;
 
+// todo: keep an eye out for optimizing center as a borrow
+fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> bool {
+    let oc = ray.origin - center; // vector from sphere center to ray origin
+
+    let a = ray.direction.dot(ray.direction);
+    let b = 2.0 * oc.dot(ray.direction);
+    let c = oc.dot(oc) - radius * radius;
+    let discriminant = b * b - 4.0 * a * c;
+    
+    discriminant > 0.0
+}
+
 fn color(r: &Ray) -> Vec3 {
-    let unit_direction = r.direction.normalized();
-    let t = 0.5 * (unit_direction.y + 1.0);
-    Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
+        Vec3::new(1.0, 0.0, 0.0)
+    } else {
+        let unit_direction = r.direction.normalized();
+        let t = 0.5 * (unit_direction.y + 1.0);
+        Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+    }
 }
 
 fn main() {
