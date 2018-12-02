@@ -1,6 +1,8 @@
 mod image_wrapper;
+mod vector_math;
 
-use image_wrapper::ImageDataRGB;
+pub use image_wrapper::ImageDataRGB;
+pub use vector_math::vec3::Vec3;
 
 fn main() {
 
