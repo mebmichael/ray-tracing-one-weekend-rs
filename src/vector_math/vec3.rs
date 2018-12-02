@@ -1,12 +1,12 @@
-use std::ops::Neg;
 use std::ops::Add;
-use std::ops::Sub;
-use std::ops::Mul;
-use std::ops::Div;
 use std::ops::AddAssign;
-use std::ops::SubAssign;
-use std::ops::MulAssign;
+use std::ops::Div;
 use std::ops::DivAssign;
+use std::ops::Mul;
+use std::ops::MulAssign;
+use std::ops::Neg;
+use std::ops::Sub;
+use std::ops::SubAssign;
 
 // Vec3 is a vector class
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -57,7 +57,7 @@ impl Vec3 {
         Vec3 {
             x: self.y * rhs.z - self.z * rhs.y,
             y: -(self.x * rhs.z - self.z * rhs.x),
-            z: self.x * rhs.y - self.y * rhs.x
+            z: self.x * rhs.y - self.y * rhs.x,
         }
     }
 }
@@ -90,7 +90,7 @@ impl Sub for Vec3 {
         Vec3 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
-            z: self.z - rhs.z
+            z: self.z - rhs.z,
         }
     }
 }
@@ -101,7 +101,7 @@ impl Mul<f32> for Vec3 {
         Vec3 {
             x: self.x * rhs,
             y: self.y * rhs,
-            z: self.z * rhs
+            z: self.z * rhs,
         }
     }
 }
@@ -116,7 +116,7 @@ impl Div<f32> for Vec3 {
         Vec3 {
             x: self.x / rhs,
             y: self.y / rhs,
-            z: self.z / rhs
+            z: self.z / rhs,
         }
     }
 }
@@ -191,7 +191,7 @@ mod operator_tests {
     #[test]
     fn vec3_div_f32() {
         let a = Vec3::new(2.0, 6.0, 10.0);
-        assert_eq!(a / 2.0, Vec3::new(1.0, 3.0, 5.0));        
+        assert_eq!(a / 2.0, Vec3::new(1.0, 3.0, 5.0));
     }
 
     #[test]
