@@ -5,21 +5,27 @@ pub use image_wrapper::ImageDataRGB;
 pub use vector_math::vec3::Vec3;
 pub use vector_math::ray::Ray;
 
-// todo: keep an eye out for optimizing center as a borrow
-fn hit_sphere(center: Vec3, radius: f32, ray: &Ray) -> bool {
-    let oc = ray.origin - center; // vector from sphere center to ray origin
+fn hit_sphere(center: &Vec3, radius: f32, ray: &Ray) -> f32 {
+    let oc = ray.origin - *center; // vector from sphere center to ray origin
 
     let a = ray.direction.dot(ray.direction);
     let b = 2.0 * oc.dot(ray.direction);
     let c = oc.dot(oc) - radius * radius;
     let discriminant = b * b - 4.0 * a * c;
     
-    discriminant > 0.0
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - f32::sqrt(discriminant)) / (2.0 * a)
+    }
 }
 
 fn color(r: &Ray) -> Vec3 {
-    if hit_sphere(Vec3::new(0.0, 0.0, -1.0), 0.5, r) {
-        Vec3::new(1.0, 0.0, 0.0)
+    let sphere_center = Vec3::new(0.0, 0.0, -1.0);
+    let t = hit_sphere(&sphere_center, 0.5, r);
+    if t > 0.0 {
+        let n = (r.point_at(t) - sphere_center).normalized();
+        (n + Vec3::new(1.0, 1.0, 1.0)) * 0.5
     } else {
         let unit_direction = r.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
