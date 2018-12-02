@@ -24,7 +24,9 @@ impl ImageDataRGB {
             return;
         }
 
-        let offset = (pixel.0 + pixel.1 * self.width) as usize * 3;
+        let y = self.height - pixel.1 - 1;
+
+        let offset = (pixel.0 + y * self.width) as usize * 3;
         self.pixels[offset] = rgb.0;
         self.pixels[offset + 1] = rgb.1;
         self.pixels[offset + 2] = rgb.2;
