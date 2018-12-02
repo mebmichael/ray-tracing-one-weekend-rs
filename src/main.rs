@@ -3,6 +3,7 @@ mod vector_math;
 
 pub use image_wrapper::ImageDataRGB;
 pub use vector_math::vec3::Vec3;
+pub use vector_math::ray;
 
 fn main() {
     let mut image = ImageDataRGB::new(200, 100);
