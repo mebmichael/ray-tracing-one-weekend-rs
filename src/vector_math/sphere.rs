@@ -2,6 +2,7 @@ use vector_math::hitable::{HitRecord, Hitable};
 use vector_math::ray::Ray;
 use vector_math::vec3::Vec3;
 
+#[derive(Copy, Clone, Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,

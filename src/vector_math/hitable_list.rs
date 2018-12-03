@@ -2,7 +2,7 @@ use vector_math::hitable::{HitRecord, Hitable};
 use vector_math::ray::Ray;
 
 pub struct HitableList {
-    pub list: Vec<Box<Hitable>>
+    pub list: Vec<Box<Hitable>>,
 }
 
 impl Hitable for HitableList {

@@ -1,7 +1,7 @@
 use vector_math::ray::Ray;
 use vector_math::vec3::Vec3;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct HitRecord {
     pub t: f32,
     pub p: Vec3,
