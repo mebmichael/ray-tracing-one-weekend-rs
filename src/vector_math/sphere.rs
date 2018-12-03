@@ -18,18 +18,15 @@ impl Hitable for Sphere {
         let oc = ray.origin - self.center; // vector from sphere center to ray origin
 
         let a = ray.direction.dot(ray.direction);
-        let b = 2.0 * oc.dot(ray.direction);
+        let b = oc.dot(ray.direction);
         let c = oc.dot(oc) - self.radius * self.radius;
-        let discriminant = b * b - 4.0 * a * c;
+        let discriminant = b * b - a * c;
 
         if discriminant > 0.0 {
             let updated_record_fn = |t: f32| -> HitRecord {
                 let p = ray.point_at(t);
-                HitRecord {
-                    t,
-                    p,
-                    normal: ((p - self.center) / self.radius).normalized(), // note: "normalized" here is added
-                }
+                let normal = ((p - self.center) / self.radius).normalized(); // note: "normalized" here is added
+                HitRecord::new(t, p, normal)
             };
 
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
