@@ -14,11 +14,24 @@ pub use vector_math::vec3::*;
 
 use rand::prelude::*;
 
+fn random_in_unit_sphere() -> Vec3 {
+    let mut rng = thread_rng();
+    loop {
+        let p = Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+
+        if p.squared_magnitude() >= 1.0 {
+            return p;
+        }
+    }
+}
+
 fn get_color(r: &Ray, world: &HitableList) -> Vec3 {
     let mut rec = HitRecord::zero();
 
-    if world.hit(r, 0.0, std::f32::MAX, &mut rec) {
-        (rec.normal + Vec3::new(1.0, 1.0, 1.0)) * 0.5
+    if world.hit(r, 0.001, std::f32::MAX, &mut rec) {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        let random_ray = Ray::new(rec.p, target - rec.p);
+        get_color(&random_ray, world) * 0.5
     } else {
         let unit_direction = r.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
@@ -54,17 +67,15 @@ fn main() {
             let mut color = Vec3::zero();
 
             for _ in 0..sample_count {
-                let ru: f32 = rng.gen();
-                let rv: f32 = rng.gen();
-
-                let u = (i as f32 + ru) / image_width;
-                let v = (j as f32 + rv) / image_height;
+                let u = (i as f32 + rng.gen::<f32>()) / image_width;
+                let v = (j as f32 + rng.gen::<f32>()) / image_height;
 
                 let r = camera.get_ray(u, v);
                 color += get_color(&r, &world);
             }
 
             color /= sample_count as f32;
+            color = Vec3::new(f32::sqrt(color.x), f32::sqrt(color.y), f32::sqrt(color.z));
 
             let r = (255.99 * color.x) as u8;
             let g = (255.99 * color.y) as u8;
