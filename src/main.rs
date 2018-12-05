@@ -17,7 +17,7 @@ use rand::prelude::*;
 fn random_in_unit_sphere() -> Vec3 {
     let mut rng = thread_rng();
     loop {
-        let p = Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()) * 2.0 - Vec3::new(1.0, 1.0, 1.0);
+        let p = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()) - Vec3::new(1.0, 1.0, 1.0);
 
         if p.squared_magnitude() >= 1.0 {
             return p;
@@ -35,7 +35,7 @@ fn get_color(r: &Ray, world: &HitableList) -> Vec3 {
     } else {
         let unit_direction = r.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
-        Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
+        (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
     }
 }
 
