@@ -19,7 +19,7 @@ fn random_in_unit_sphere() -> Vec3 {
     loop {
         let p = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()) - Vec3::new(1.0, 1.0, 1.0);
 
-        if p.squared_magnitude() >= 1.0 {
+        if p.squared_magnitude() < 1.0 {
             return p;
         }
     }
@@ -30,8 +30,8 @@ fn get_color(r: &Ray, world: &HitableList) -> Vec3 {
 
     if world.hit(r, 0.001, std::f32::MAX, &mut rec) {
         let target = rec.p + rec.normal + random_in_unit_sphere();
-        let random_ray = Ray::new(rec.p, target - rec.p);
-        get_color(&random_ray, world) * 0.5
+        let ray_to_target = Ray::new(rec.p, target - rec.p);
+        get_color(&ray_to_target, world) * 0.5
     } else {
         let unit_direction = r.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
