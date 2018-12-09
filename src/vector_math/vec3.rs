@@ -117,6 +117,17 @@ impl Mul<Vec3> for f32 {
     }
 }
 
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, rhs: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
+    }
+}
+
 impl Div<f32> for Vec3 {
     type Output = Vec3;
     fn div(self, rhs: f32) -> Self {
@@ -198,6 +209,13 @@ mod operator_tests {
         let a = Vec3::new(1.0, 3.0, 5.0);
         assert_eq!(a * 2.0, Vec3::new(2.0, 6.0, 10.0));
         assert_eq!(2.0 * a, Vec3::new(2.0, 6.0, 10.0));
+    }
+
+    #[test]
+    fn vec3_mul_vec3() {
+        let a = Vec3::new(1.0, 3.0, 5.0);
+        let b = Vec3::new(2.0, 3.0, 4.0);
+        assert_eq!(a * b, Vec3::new(2.0, 9.0, 20.0));
     }
 
     #[test]

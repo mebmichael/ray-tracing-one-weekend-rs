@@ -1,25 +1,28 @@
-use vector_math::hitable::{HitRecord, Hitable};
-use vector_math::ray::Ray;
+use vector_math::hitable::Hitable;
+use vector_math::light_ray::LightRay;
 
 pub struct HitableList {
     pub list: Vec<Box<Hitable>>,
 }
 
-impl Hitable for HitableList {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
-        let mut temp_rec = HitRecord::zero();
-
-        let mut hit_anything = false;
+impl HitableList {
+    pub fn scatter(&self, path: &LightRay, t_min: f32, t_max: f32) -> Option<LightRay> {
         let mut closest_so_far = t_max;
+        let mut hit_result: Option<&Box<Hitable>> = None;
 
         for item in &self.list {
-            if item.hit(ray, t_min, closest_so_far, &mut temp_rec) {
-                hit_anything = true;
-                closest_so_far = temp_rec.t;
-                *record = temp_rec;
+            match item.hit_test(&path.ray, t_min, closest_so_far) {
+                Some(t) => {
+                    closest_so_far = t;
+                    hit_result = Some(item);
+                }
+                None => {}
             }
         }
 
-        hit_anything
+        match hit_result {
+            Some(object) => object.scatter(path),
+            None => None,
+        }
     }
 }

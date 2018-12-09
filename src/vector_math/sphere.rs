@@ -1,21 +1,23 @@
-use vector_math::hitable::{HitRecord, Hitable};
+use vector_math::hitable::{Hitable};
 use vector_math::ray::Ray;
 use vector_math::vec3::Vec3;
+use vector_math::material::*;
+use vector_math::light_ray::LightRay;
 
-#[derive(Copy, Clone, Debug)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
+    pub material: Box<Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32) -> Self {
-        Sphere { center, radius }
+    pub fn new(center: Vec3, radius: f32, material: Box<Material>) -> Self {
+        Sphere { center, radius, material }
     }
 }
 
 impl Hitable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f32, t_max: f32, record: &mut HitRecord) -> bool {
+    fn hit_test(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<f32> {
         let oc = ray.origin - self.center; // vector from sphere center to ray origin
 
         let a = ray.direction.dot(ray.direction);
@@ -24,25 +26,30 @@ impl Hitable for Sphere {
         let discriminant = b * b - a * c;
 
         if discriminant > 0.0 {
-            let updated_record_fn = |t: f32| -> HitRecord {
-                let p = ray.point_at(t);
-                let normal = ((p - self.center) / self.radius).normalized(); // note: "normalized" here is added
-                HitRecord::new(t, p, normal)
-            };
-
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
-                *record = updated_record_fn(temp);
-                return true;
+                return Some(temp)
             }
 
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
-                *record = updated_record_fn(temp);
-                return true;
+                return Some(temp)
             }
         }
 
-        return false;
+        None
+    }
+
+    fn scatter(&self, incident: &LightRay) -> Option<LightRay> {
+        match self.hit_test(&incident.ray, 0.0, std::f32::MAX) {
+            Some(t) => {
+                let hit_point = incident.ray.point_at(t);
+                let incoming_ray = Ray::new(hit_point, incident.ray.direction); // assuming direction is normalized
+                let incoming_light = LightRay::new(incoming_ray, incident.color);
+                let normal = (hit_point - self.center).normalized();
+                self.material.scatter(&incoming_light, &hit_point, &normal)
+            },
+            None => None
+        }
     }
 }

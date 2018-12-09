@@ -11,31 +11,30 @@ pub use vector_math::hitable_list::*;
 pub use vector_math::ray::*;
 pub use vector_math::sphere::*;
 pub use vector_math::vec3::*;
-
+pub use vector_math::random_methods::*;
+pub use vector_math::material::*;
+pub use vector_math::light_ray::LightRay;
 use rand::prelude::*;
 
-fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = thread_rng();
-    loop {
-        let p = 2.0 * Vec3::new(rng.gen::<f32>(), rng.gen::<f32>(), rng.gen::<f32>()) - Vec3::new(1.0, 1.0, 1.0);
+fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -> Vec3 {
 
-        if p.squared_magnitude() < 1.0 {
-            return p;
-        }
-    }
-}
-
-fn get_color(r: &Ray, world: &HitableList) -> Vec3 {
-    let mut rec = HitRecord::zero();
-
-    if world.hit(r, 0.001, std::f32::MAX, &mut rec) {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
-        let ray_to_target = Ray::new(rec.p, target - rec.p);
-        get_color(&ray_to_target, world) * 0.5
-    } else {
-        let unit_direction = r.direction.normalized();
+    let sky_color = || {
+        let unit_direction = path.ray.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
         (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+    };
+
+    if depth >= max_depth {
+        return sky_color();
+    }
+
+    match world.scatter(path, 0.001, std::f32::MAX) {
+        Some(new_path) => {
+            get_color(&new_path, &world, depth + 1, max_depth)
+        },
+        None => {
+            path.color * sky_color()
+        }
     }
 }
 
@@ -46,11 +45,18 @@ fn main() {
     let image_width = image.width as f32;
     let image_height = image.height as f32;
 
-    let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5));
-    let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0));
+    let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
+    let mat2 = Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)));
+    let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2)));
+    let mat4 = Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8)));
+
+    let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, mat1));
+    let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, mat2));
+    let sphere3 = Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, mat3));
+    let sphere4 = Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, mat4));
 
     let world = HitableList {
-        list: vec![sphere1, sphere2],
+        list: vec![sphere1, sphere2, sphere3, sphere4],
     };
 
     let camera = Camera::new(
@@ -71,7 +77,8 @@ fn main() {
                 let v = (j as f32 + rng.gen::<f32>()) / image_height;
 
                 let r = camera.get_ray(u, v);
-                color += get_color(&r, &world);
+                let path = LightRay::new(r, Vec3::new(1.0, 1.0, 1.0));
+                color += get_color(&path, &world, 0, 50);
             }
 
             color /= sample_count as f32;
