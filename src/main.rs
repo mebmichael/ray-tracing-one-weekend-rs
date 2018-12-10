@@ -47,8 +47,8 @@ fn main() {
 
     let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
     let mat2 = Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)));
-    let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2)));
-    let mat4 = Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8)));
+    let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0));
+    let mat4 = Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3));
 
     let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, mat1));
     let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, mat2));

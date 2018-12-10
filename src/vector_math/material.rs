@@ -33,11 +33,12 @@ fn reflect(v: &Vec3, normal: &Vec3) -> Vec3 {
 
 pub struct Metal {
     pub albedo: Vec3,
+    pub roughness: f32,
 }
 
 impl Metal {
-    pub fn new(albedo: Vec3) -> Self {
-        Metal { albedo }
+    pub fn new(albedo: Vec3, roughness: f32) -> Self {
+        Metal { albedo, roughness }
     }
 }
 
@@ -46,7 +47,7 @@ impl Material for Metal {
         let reflected = reflect(&incident.ray.direction, surface_normal); // direction is assumed to be normalized
 
         if reflected.dot(*surface_normal) > 0.0 {
-            let outgoing_ray = Ray::new(*hit_point, reflected);
+            let outgoing_ray = Ray::new(*hit_point, reflected + self.roughness * random_in_unit_sphere());
             let outgoing = LightRay::new(outgoing_ray, incident.color * self.albedo);
             Some(outgoing)
         } else {
