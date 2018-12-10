@@ -47,7 +47,7 @@ impl Material for Metal {
 
         if reflected.dot(*surface_normal) > 0.0 {
             let outgoing_ray = Ray::new(*hit_point, reflected);
-            let outgoing = LightRay::new(outgoing_ray, self.albedo);
+            let outgoing = LightRay::new(outgoing_ray, incident.color * self.albedo);
             Some(outgoing)
         } else {
             None

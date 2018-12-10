@@ -25,7 +25,7 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
     };
 
     if depth >= max_depth {
-        return sky_color();
+        return path.color * sky_color();
     }
 
     match world.scatter(path, 0.001, std::f32::MAX) {
