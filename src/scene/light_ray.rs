@@ -1,5 +1,5 @@
-use vector_math::vec3::Vec3;
 use vector_math::ray::Ray;
+use vector_math::vec3::Vec3;
 
 #[derive(Clone, Copy, Debug)]
 pub struct LightRay {

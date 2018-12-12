@@ -1,4 +1,4 @@
-use vector_math::light_ray::LightRay;
+use scene::light_ray::LightRay;
 use vector_math::ray::Ray;
 
 pub trait Hitable {

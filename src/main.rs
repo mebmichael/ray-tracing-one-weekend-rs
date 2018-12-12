@@ -1,23 +1,22 @@
 extern crate rand;
 
-mod camera;
 mod image_wrapper;
+mod scene;
 mod vector_math;
 
-pub use camera::*;
 pub use image_wrapper::*;
-pub use vector_math::hitable::*;
-pub use vector_math::hitable_list::*;
-pub use vector_math::ray::*;
-pub use vector_math::sphere::*;
-pub use vector_math::vec3::*;
-pub use vector_math::random_methods::*;
-pub use vector_math::material::*;
-pub use vector_math::light_ray::LightRay;
 use rand::prelude::*;
+pub use scene::camera::Camera;
+pub use scene::hitable::*;
+pub use scene::hitable_list::*;
+pub use scene::light_ray::LightRay;
+pub use scene::material::*;
+pub use scene::sphere::*;
+pub use vector_math::random_methods::*;
+pub use vector_math::ray::*;
+pub use vector_math::vec3::*;
 
 fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -> Vec3 {
-
     let sky_color = || {
         let unit_direction = path.ray.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
@@ -29,12 +28,8 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
     }
 
     match world.scatter(path, 0.001, std::f32::MAX) {
-        Some(new_path) => {
-            get_color(&new_path, &world, depth + 1, max_depth)
-        },
-        None => {
-            path.color * sky_color()
-        }
+        Some(new_path) => get_color(&new_path, &world, depth + 1, max_depth),
+        None => path.color * sky_color(),
     }
 }
 

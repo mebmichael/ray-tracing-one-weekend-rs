@@ -1,8 +1,8 @@
-use vector_math::hitable::{Hitable};
+use scene::hitable::Hitable;
+use scene::light_ray::LightRay;
+use scene::material::*;
 use vector_math::ray::Ray;
 use vector_math::vec3::Vec3;
-use vector_math::material::*;
-use vector_math::light_ray::LightRay;
 
 pub struct Sphere {
     pub center: Vec3,
@@ -12,7 +12,11 @@ pub struct Sphere {
 
 impl Sphere {
     pub fn new(center: Vec3, radius: f32, material: Box<Material>) -> Self {
-        Sphere { center, radius, material }
+        Sphere {
+            center,
+            radius,
+            material,
+        }
     }
 }
 
@@ -28,12 +32,12 @@ impl Hitable for Sphere {
         if discriminant > 0.0 {
             let temp = (-b - f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
-                return Some(temp)
+                return Some(temp);
             }
 
             let temp = (-b + f32::sqrt(b * b - a * c)) / a;
             if temp < t_max && temp > t_min {
-                return Some(temp)
+                return Some(temp);
             }
         }
 
@@ -48,8 +52,8 @@ impl Hitable for Sphere {
                 let incoming_light = LightRay::new(incoming_ray, incident.color);
                 let normal = (hit_point - self.center).normalized();
                 self.material.scatter(&incoming_light, &hit_point, &normal)
-            },
-            None => None
+            }
+            None => None,
         }
     }
 }

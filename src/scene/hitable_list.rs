@@ -1,5 +1,5 @@
-use vector_math::hitable::Hitable;
-use vector_math::light_ray::LightRay;
+use scene::hitable::Hitable;
+use scene::light_ray::LightRay;
 
 pub struct HitableList {
     pub list: Vec<Box<Hitable>>,

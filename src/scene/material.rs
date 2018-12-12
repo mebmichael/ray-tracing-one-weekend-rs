@@ -1,10 +1,15 @@
+use scene::light_ray::LightRay;
 use vector_math::random_methods::random_in_unit_sphere;
 use vector_math::ray::Ray;
 use vector_math::vec3::Vec3;
-use vector_math::light_ray::LightRay;
 
 pub trait Material {
-    fn scatter(&self, incident: &LightRay, hit_point: &Vec3, surface_normal: &Vec3) -> Option<LightRay>;
+    fn scatter(
+        &self,
+        incident: &LightRay,
+        hit_point: &Vec3,
+        surface_normal: &Vec3,
+    ) -> Option<LightRay>;
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -19,7 +24,12 @@ impl Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, incident: &LightRay, hit_point: &Vec3,  surface_normal: &Vec3) -> Option<LightRay> {
+    fn scatter(
+        &self,
+        incident: &LightRay,
+        hit_point: &Vec3,
+        surface_normal: &Vec3,
+    ) -> Option<LightRay> {
         let exitance_direction = *surface_normal + random_in_unit_sphere();
         let exitance_ray = Ray::new(*hit_point, exitance_direction.normalized());
         let color = incident.color * self.albedo;
@@ -43,11 +53,19 @@ impl Metal {
 }
 
 impl Material for Metal {
-    fn scatter(&self, incident: &LightRay, hit_point: &Vec3,  surface_normal: &Vec3) -> Option<LightRay> {
+    fn scatter(
+        &self,
+        incident: &LightRay,
+        hit_point: &Vec3,
+        surface_normal: &Vec3,
+    ) -> Option<LightRay> {
         let reflected = reflect(&incident.ray.direction, surface_normal); // direction is assumed to be normalized
 
         if reflected.dot(*surface_normal) > 0.0 {
-            let outgoing_ray = Ray::new(*hit_point, reflected + self.roughness * random_in_unit_sphere());
+            let outgoing_ray = Ray::new(
+                *hit_point,
+                reflected + self.roughness * random_in_unit_sphere(),
+            );
             let outgoing = LightRay::new(outgoing_ray, incident.color * self.albedo);
             Some(outgoing)
         } else {

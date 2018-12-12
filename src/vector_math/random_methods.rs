@@ -1,5 +1,5 @@
+use super::vec3::Vec3;
 use rand::prelude::*;
-use vector_math::vec3::Vec3;
 
 pub fn random_in_unit_sphere() -> Vec3 {
     let mut rng = thread_rng();
