@@ -64,6 +64,8 @@ fn main() {
     let mut rng = thread_rng();
 
     for j in 0..image.height {
+        println!("{}%", (100.0 * j as f32 / sample_count as f32) as u32);
+
         for i in 0..image.width {
             let mut color = Vec3::zero();
 
@@ -86,6 +88,8 @@ fn main() {
             image.set_pixel((i, j), (r, g, b));
         }
     }
+
+    println!("100%");
 
     let image_name = "output/image.png";
     let result = image.save(image_name);
