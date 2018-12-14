@@ -7,12 +7,14 @@ mod vector_math;
 pub use image_wrapper::*;
 use rand::prelude::*;
 pub use scene::camera::Camera;
+pub use scene::dielectric::Dielectric;
 pub use scene::hitable::*;
 pub use scene::hitable_list::*;
+pub use scene::lambertian::Lambertian;
 pub use scene::light_ray::LightRay;
-pub use scene::material::*;
-pub use scene::sphere::*;
-pub use vector_math::random_methods::*;
+pub use scene::material::Material;
+pub use scene::metal::Metal;
+pub use scene::sphere::Sphere;
 pub use vector_math::ray::*;
 pub use vector_math::vec3::*;
 
@@ -24,12 +26,18 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
     };
 
     if depth >= max_depth {
-        return path.color * sky_color();
+        return Vec3::zero();
     }
 
     match world.scatter(path, 0.001, std::f32::MAX) {
         Some(new_path) => get_color(&new_path, &world, depth + 1, max_depth),
-        None => path.color * sky_color(),
+        None => {
+            if depth < max_depth {
+                path.color * sky_color()
+            } else {
+                Vec3::zero()
+            }
+        }
     }
 }
 
@@ -43,7 +51,7 @@ fn main() {
     let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
     let mat2 = Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)));
     let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0));
-    let mat4 = Box::new(Metal::new(Vec3::new(0.8, 0.8, 0.8), 0.3));
+    let mat4 = Box::new(Dielectric::new(1.5));
 
     let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, mat1));
     let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, mat2));

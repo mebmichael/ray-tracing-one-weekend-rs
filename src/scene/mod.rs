@@ -1,6 +1,10 @@
 pub mod camera;
+pub mod dielectric;
 pub mod hitable;
 pub mod hitable_list;
+pub mod lambertian;
 pub mod light_ray;
 pub mod material;
+pub mod metal;
 pub mod sphere;
+pub mod surface_interface;
