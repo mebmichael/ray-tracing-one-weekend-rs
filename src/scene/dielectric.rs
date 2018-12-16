@@ -1,10 +1,11 @@
-use scene::material::Material;
-use vector_math::vec3::Vec3;
+use rand::prelude::*;
 use scene::light_ray::LightRay;
+use scene::material::Material;
 use scene::surface_interface::{reflect, refract, schlick};
 use vector_math::ray::Ray;
-use rand::prelude::*;
+use vector_math::vec3::Vec3;
 
+#[derive(Copy, Clone, Debug)]
 pub struct Dielectric {
     pub refractive_index: f32,
 }
@@ -22,10 +23,9 @@ impl Material for Dielectric {
         hit_point: &Vec3,
         surface_normal: &Vec3,
     ) -> Option<LightRay> {
-
         let color = Vec3::new(1.0, 1.0, 1.0);
         let cos = incident.ray.direction.dot(*surface_normal) / incident.ray.direction.magnitude();
-        
+
         let outward_normal: Vec3;
         let ni_over_nt: f32;
         let cosine: f32;
@@ -46,17 +46,18 @@ impl Material for Dielectric {
             Some(refracted) => {
                 let mut rng = thread_rng(); // todo: consider the cost of this call, perhaps we need a shared ref.
                 if rng.gen::<f32>() < schlick(cosine, self.refractive_index) {
-                    let ray = Ray::new(*hit_point, reflect(&incident.ray.direction, surface_normal));
+                    let ray =
+                        Ray::new(*hit_point, reflect(&incident.ray.direction, surface_normal));
                     Some(LightRay::new(ray, incident.color * color))
                 } else {
                     let ray = Ray::new(*hit_point, refracted);
                     Some(LightRay::new(ray, incident.color * color))
                 }
-            },
+            }
             None => {
                 let ray = Ray::new(*hit_point, reflect(&incident.ray.direction, surface_normal));
                 Some(LightRay::new(ray, incident.color * color))
-            },
+            }
         }
     }
 }

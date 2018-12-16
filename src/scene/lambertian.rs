@@ -10,8 +10,10 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(albedo: Vec3) -> Self {
-        Lambertian { albedo }
+    pub fn new(r: f32, g: f32, b: f32) -> Self {
+        Lambertian {
+            albedo: Vec3::new(r, g, b),
+        }
     }
 }
 

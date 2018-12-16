@@ -11,9 +11,9 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f32, material: Box<Material>) -> Self {
+    pub fn new(x: f32, y: f32, z: f32, radius: f32, material: Box<Material>) -> Self {
         Sphere {
-            center,
+            center: Vec3::new(x, y, z),
             radius,
             material,
         }
