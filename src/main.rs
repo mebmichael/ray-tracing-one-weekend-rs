@@ -18,7 +18,7 @@ pub use scene::sphere::Sphere;
 pub use vector_math::ray::*;
 pub use vector_math::vec3::*;
 
-fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -> Vec3 {
+fn get_color(path: &LightRay, scene: &HitableList, depth: u32, max_depth: u32) -> Vec3 {
     let sky_color = || {
         let unit_direction = path.ray.direction.normalized();
         let t = 0.5 * (unit_direction.y + 1.0);
@@ -29,8 +29,8 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
         return Vec3::zero();
     }
 
-    match world.scatter(path, 0.001, std::f32::MAX) {
-        Some(new_path) => get_color(&new_path, &world, depth + 1, max_depth),
+    match scene.scatter(path, 0.001, std::f32::MAX) {
+        Some(new_path) => get_color(&new_path, &scene, depth + 1, max_depth),
         None => {
             if depth < max_depth {
                 path.color * sky_color()
@@ -41,7 +41,7 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
     }
 }
 
-fn test_world() -> HitableList {
+fn test_scene() -> HitableList {
     let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
     let mat2 = Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.8)));
     let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.2));
@@ -67,7 +67,7 @@ fn test_camera(aspect: f32) -> Camera {
     Camera::new(origin, look_at, up, fov, aspect, aperture, dist_to_focus)
 }
 
-fn render(width: u32, height: u32, sample_count: u32, max_depth: u32, world: &HitableList, camera: &Camera) -> ImageDataRGB {
+fn render(width: u32, height: u32, sample_count: u32, max_depth: u32, scene: &HitableList, camera: &Camera) -> ImageDataRGB {
     let mut image = ImageDataRGB::new(width, height);
 
     let image_width = image.width as f32;
@@ -87,7 +87,7 @@ fn render(width: u32, height: u32, sample_count: u32, max_depth: u32, world: &Hi
 
                 let r = camera.get_ray(u, v);
                 let path = LightRay::new(r, Vec3::new(1.0, 1.0, 1.0));
-                color += get_color(&path, &world, 0, max_depth);
+                color += get_color(&path, &scene, 0, max_depth);
             }
 
             color /= sample_count as f32;
@@ -113,10 +113,10 @@ fn main() {
     let sample_count = 100;
     let max_depth = 50;
 
-    let world = test_world();
+    let scene = test_scene();
     let camera = test_camera(aspect);
 
-    let image = render(width, height, sample_count, max_depth, &world, &camera);
+    let image = render(width, height, sample_count, max_depth, &scene, &camera);
     let image_name = "output/image.png";
     let result = image.save(image_name);
     match result {
