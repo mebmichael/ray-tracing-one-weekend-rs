@@ -64,12 +64,14 @@ fn main() {
 
     let camera: Camera;
     {
-        let origin = Vec3::new(-2.5, 1.5, 2.0);
+        let origin = Vec3::new(3.0, 3.0, 3.0);
         let look_at = Vec3::new(0.0, 0.0, 0.0);
         let up = Vec3::new(0.0, 1.0, 0.0);
-        let fov = 30.0;
+        let fov = 20.0;
         let aspect = image_width / image_height;
-        camera = Camera::new(origin, look_at, up, fov, aspect);
+        let dist_to_focus = (origin - look_at).magnitude();
+        let aperture = 2.0;
+        camera = Camera::new(origin, look_at, up, fov, aspect, aperture, dist_to_focus);
     };
 
     let mut rng = thread_rng();
