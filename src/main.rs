@@ -49,25 +49,28 @@ fn main() {
     let image_height = image.height as f32;
 
     let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
-    let mat2 = Box::new(Lambertian::new(Vec3::new(0.8, 0.3, 0.3)));
-    let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0));
+    let mat2 = Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.8)));
+    let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.2));
     let mat4 = Box::new(Dielectric::new(1.5));
 
-    let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, -1.0), 100.0, mat1));
-    let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, -1.0), 0.5, mat2));
-    let sphere3 = Box::new(Sphere::new(Vec3::new(1.0, 0.0, -1.0), 0.5, mat3));
-    let sphere4 = Box::new(Sphere::new(Vec3::new(-1.0, 0.0, -1.0), 0.5, mat4));
+    let sphere1 = Box::new(Sphere::new(Vec3::new(0.0, -100.5, 0.0), 100.0, mat1));
+    let sphere2 = Box::new(Sphere::new(Vec3::new(0.0, 0.0, 0.0), 0.5, mat2));
+    let sphere3 = Box::new(Sphere::new(Vec3::new(1.0, 0.0, 0.0), 0.5, mat3));
+    let sphere4 = Box::new(Sphere::new(Vec3::new(-1.0, 0.0, 0.0), 0.5, mat4));
 
     let world = HitableList {
         list: vec![sphere1, sphere2, sphere3, sphere4],
     };
 
-    let camera = Camera::new(
-        Vec3::new(0.0, 0.0, 0.0),
-        Vec3::new(-2.0, -1.0, -1.0),
-        Vec3::new(4.0, 0.0, 0.0),
-        Vec3::new(0.0, 2.0, 0.0),
-    );
+    let camera: Camera;
+    {
+        let origin = Vec3::new(-2.5, 1.5, 2.0);
+        let look_at = Vec3::new(0.0, 0.0, 0.0);
+        let up = Vec3::new(0.0, 1.0, 0.0);
+        let fov = 30.0;
+        let aspect = image_width / image_height;
+        camera = Camera::new(origin, look_at, up, fov, aspect);
+    };
 
     let mut rng = thread_rng();
 

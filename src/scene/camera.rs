@@ -9,12 +9,21 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn new(origin: Vec3, lower_left_corner: Vec3, horizontal: Vec3, vertical: Vec3) -> Self {
+    /// `fov` is vertical field-of-view.
+    pub fn new(origin: Vec3, look_at: Vec3, up: Vec3, fov: f32, aspect: f32) -> Self {
+        let theta = fov * std::f32::consts::PI / 180.0;
+        let half_height = (theta / 2.0).tan();
+        let half_width = aspect * half_height;
+
+        let w = (origin - look_at).normalized();
+        let u = up.cross(w);
+        let v = w.cross(u);
+
         Camera {
-            origin,
-            lower_left_corner,
-            horizontal,
-            vertical,
+            origin: origin,
+            lower_left_corner: origin - half_width * u - half_height * v - w,
+            horizontal: 2.0 * half_width * u,
+            vertical: 2.0 * half_height * v,
         }
     }
 
