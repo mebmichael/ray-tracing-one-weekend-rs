@@ -15,6 +15,7 @@ pub use scene::light_ray::LightRay;
 pub use scene::material::Material;
 pub use scene::metal::Metal;
 pub use scene::sphere::Sphere;
+use std::str::FromStr;
 pub use vector_math::ray::*;
 pub use vector_math::vec3::*;
 
@@ -174,7 +175,7 @@ fn render(
     let mut rng = thread_rng();
 
     for j in 0..image.height {
-        println!("{}%", (100.0 * j as f32 / sample_count as f32) as u32);
+        println!("{}%", (100.0 * j as f32 / image_height) as u32);
 
         for i in 0..image.width {
             let mut color = Vec3::zero();
@@ -204,12 +205,21 @@ fn render(
     image
 }
 
+fn parse_arg<T: FromStr>(offset: usize, default: T) -> T {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() < offset + 1 {
+        return default;
+    }
+
+    T::from_str(&args[offset]).unwrap_or(default)
+}
+
 fn main() {
-    let width = 200;
-    let height = 100;
+    let width = parse_arg(1, 200);
+    let height = parse_arg(2, 100);
     let aspect = width as f32 / height as f32;
-    let sample_count = 100;
-    let max_depth = 50;
+    let sample_count = parse_arg(3, 100);
+    let max_depth = parse_arg(4, 50);
 
     let scene = cover_scene();
     let camera = cover_camera(aspect);
