@@ -9,7 +9,6 @@ pub struct Camera {
     vertical: Vec3,
     lens_radius: f32,
     up: Vec3,
-    forward: Vec3,
     right: Vec3,
 }
 
@@ -22,17 +21,16 @@ impl Camera {
 
         let forward = (origin - look_at).normalized();
         let right = up.cross(forward);
-        let up_oriented = forward.cross(right);
+        let up_orthonormal = forward.cross(right);
 
         Camera {
             origin,
-            lower_left_corner: origin - (half_width * right + half_height * up_oriented + forward) * focus_dist,
+            lower_left_corner: origin - (half_width * right + half_height * up_orthonormal + forward) * focus_dist,
             horizontal: 2.0 * half_width * focus_dist * right,
-            vertical: 2.0 * half_height * focus_dist * up_oriented,
+            vertical: 2.0 * half_height * focus_dist * up_orthonormal,
             lens_radius: aperture / 2.0,
-            forward,
             right,
-            up: up_oriented,
+            up: up_orthonormal,
         }
     }
 

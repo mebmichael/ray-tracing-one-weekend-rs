@@ -41,13 +41,7 @@ fn get_color(path: &LightRay, world: &HitableList, depth: u32, max_depth: u32) -
     }
 }
 
-fn main() {
-    let mut image = ImageDataRGB::new(200, 100);
-    let sample_count: u32 = 100;
-
-    let image_width = image.width as f32;
-    let image_height = image.height as f32;
-
+fn test_world() -> HitableList {
     let mat1 = Box::new(Lambertian::new(Vec3::new(0.8, 0.8, 0.0)));
     let mat2 = Box::new(Lambertian::new(Vec3::new(0.1, 0.2, 0.8)));
     let mat3 = Box::new(Metal::new(Vec3::new(0.8, 0.6, 0.2), 0.2));
@@ -58,21 +52,26 @@ fn main() {
     let sphere3 = Box::new(Sphere::new(Vec3::new(1.0, 0.0, 0.0), 0.5, mat3));
     let sphere4 = Box::new(Sphere::new(Vec3::new(-1.0, 0.0, 0.0), 0.5, mat4));
 
-    let world = HitableList {
+    HitableList {
         list: vec![sphere1, sphere2, sphere3, sphere4],
-    };
+    }
+}
 
-    let camera: Camera;
-    {
-        let origin = Vec3::new(3.0, 3.0, 3.0);
-        let look_at = Vec3::new(0.0, 0.0, 0.0);
-        let up = Vec3::new(0.0, 1.0, 0.0);
-        let fov = 20.0;
-        let aspect = image_width / image_height;
-        let dist_to_focus = (origin - look_at).magnitude();
-        let aperture = 2.0;
-        camera = Camera::new(origin, look_at, up, fov, aspect, aperture, dist_to_focus);
-    };
+fn test_camera(aspect: f32) -> Camera {
+    let origin = Vec3::new(3.0, 3.0, 3.0);
+    let look_at = Vec3::new(0.0, 0.0, 0.0);
+    let up = Vec3::new(0.0, 1.0, 0.0);
+    let fov = 20.0;
+    let dist_to_focus = (origin - look_at).magnitude();
+    let aperture = 2.0;
+    Camera::new(origin, look_at, up, fov, aspect, aperture, dist_to_focus)
+}
+
+fn render(width: u32, height: u32, sample_count: u32, max_depth: u32, world: &HitableList, camera: &Camera) -> ImageDataRGB {
+    let mut image = ImageDataRGB::new(width, height);
+
+    let image_width = image.width as f32;
+    let image_height = image.height as f32;
 
     let mut rng = thread_rng();
 
@@ -88,7 +87,7 @@ fn main() {
 
                 let r = camera.get_ray(u, v);
                 let path = LightRay::new(r, Vec3::new(1.0, 1.0, 1.0));
-                color += get_color(&path, &world, 0, 50);
+                color += get_color(&path, &world, 0, max_depth);
             }
 
             color /= sample_count as f32;
@@ -104,6 +103,20 @@ fn main() {
 
     println!("100%");
 
+    image
+}
+
+fn main() {
+    let width = 200;
+    let height = 100;
+    let aspect = width as f32 / height as f32;
+    let sample_count = 100;
+    let max_depth = 50;
+
+    let world = test_world();
+    let camera = test_camera(aspect);
+
+    let image = render(width, height, sample_count, max_depth, &world, &camera);
     let image_name = "output/image.png";
     let result = image.save(image_name);
     match result {
